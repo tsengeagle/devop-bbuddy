@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{label.appTitle}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/layout.css" rel="stylesheet" />
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">{{label.togglenavigation}}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">{{label.appTitle}}</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{rootUrl}}">{{label.dashboard}}</a></li>
+                <li><a href="#">{{user}}</a></li>
+                <li>
+                    <form action="{{signoutUrl}}" method="post" class="navbar-form navbar-left">
+                        <button id="signout" type="submit" class="btn btn-default">{{label.signout}}</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a href="{{rootUrl}}">{{label.dashboard}} <span class="sr-only">(current)</span></a></li>
+                <li><a href="{{accountsUrl}}">{{label.accounts}}</a></li>
+                <li><a href="{{transactionsUrl}}">{{label.transactions}}</a></li>
+                <li><a href="#">{{label.export}}</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            {{>content}}
+        </div>
+    </div>
+</div>
+
+<hr/>
+
+<footer class="container" >
+    <p align="center">{{label.logo}}</p>
+</footer>
+
+<script src="/webjars/jquery/3.1.0/jquery.min.js"></script>
+<script src="/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+def updateUnitTestResult = {
+    def document = (new XmlParser()).parse(it)
+    document.@name = document.@name.substring(0, document.@name.indexOf('$'))
+    new XmlNodePrinter(new PrintWriter(it)).print(document)
+}
+
+def jacocoAgent = {
+    zipTree(configurations.jacocoAgent.singleFile).filter {
+        it.name == "jacocoagent.jar"
+    }.singleFile
+}
+
+task copyDependencyLibraries(type: Copy) {
+    into "$buildDir/output/libs"
+    from configurations.compile
+}
+
+task copyTestDependencyLibraries(type: Copy) {
+    into "$buildDir/output/test-libs"
+    from configurations.testCompile
+}
+
+task updateUnitTestResults << {
+    fileTree("${buildDir}/test-results")
+            .matching { include '**/*$*.xml' }
+            .getFiles()
+            .each updateUnitTestResult
+}
+
+task addCodeCoverageForAllTests << {
+    cucumber {
+        jvmOptions {
+            jvmArgs = ["-javaagent:${jacocoAgent()}=destfile=$buildDir/jacoco/cucumber.exec,append=false"]
+        }
+    }
+    test {
+        jacoco {
+            enabled true
+        }
+    }
+}
+
+task sonar {
+    runInSequence(it, "addCodeCoverageForAllTests", "ci", "copyDependencyLibraries", "copyTestDependencyLibraries", "updateUnitTestResults")
+}

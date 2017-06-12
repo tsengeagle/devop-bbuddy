@@ -1,0 +1,21 @@
+spring:
+    profiles:
+        active: dev
+    datasource:
+        password: dbs3cr3t
+        testWhileIdle: true
+        username: nerd
+        validationQuery: SELECT 1
+    jpa:
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL5Dialect
+        show-sql: true
+    messages:
+        basename: BindingErrorMessages
+
+application:
+    perPageLimit: 10

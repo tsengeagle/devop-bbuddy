@@ -1,0 +1,54 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">{{label.title}}</div>
+    {{^transactions.0}}
+    <div class="panel-body">{{message}}</div>
+    {{/transactions.0}}
+    {{#transactions.0}}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>{{label.type}}</th>
+            <th>{{label.description}}</th>
+            <th>{{label.date}}</th>
+            <th>{{label.amount}}</th>
+        </tr>
+        </thead>
+        {{#transactions}}
+        <tbody class="table-hover">
+        <tr>
+            <td class="text-left">{{type}}</td>
+            <td class="text-left">{{description}}</td>
+            <td class="text-left">{{dateForView}}</td>
+            <td class="text-left">{{amount}}</td>
+        </tr>
+        </tbody>
+        {{/transactions}}
+    </table>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="col-md-4 media-middle">
+                    {{#previousPageUrl}}
+                        <a href="{{previousPageUrl}}">{{label.previousPage}}</a>
+                    {{/previousPageUrl}}
+                    {{^previousPageUrl}}
+                        <span>{{label.previousPage}}</span>
+                    {{/previousPageUrl}}
+                </div>
+                <div class="col-md-4 media-middle"><span>{{currentPage}}</span></div>
+                <div class="col-md-4 media-middle">
+                    {{#nextPageUrl}}
+                        <a href="{{nextPageUrl}}">{{label.nextPage}}</a>
+                    {{/nextPageUrl}}
+                    {{^nextPageUrl}}
+                        <span>{{label.nextPage}}</span>
+                    {{/nextPageUrl}}
+                </div>
+            </div>
+            <div class="col-md-3">{{totalIncome}}</div>
+            <div class="col-md-3">{{totalOutcome}}</div>
+            <div class="col-md-3">{{balance}}</div>
+        </div>
+    </div>
+    {{/transactions.0}}
+</div>
