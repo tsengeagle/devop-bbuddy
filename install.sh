@@ -40,7 +40,7 @@ cd /var/lib/tomcat
 sudo chgrp -R tomcat conf
 sudo chmod g+rwx conf
 sudo chmod g+r conf/*
-sudo chown -R tomcat work/ temp/ logs/ webapps/
+sudo chown -R tomcat $CATALINA_HOME/
 cd ~
 
 #安裝unzip及gradle
@@ -50,16 +50,19 @@ sudo unzip gradle-2.13-bin.zip -d /opt/gradle
 echo "PATH=$PATH:/opt/gradle/gradle-2.13/bin/" >> /etc/environment
 source /etc/environment
 
+#裝git並且拉最新的code
+sudo apt-get install git -y
+git clone --depth=1 https://bitbucket.org/chaifeng/bbuddy.git
+
 #建war
-cd /vagrant
+cd bbuddy
 gradle war
 
+
 #建完的war檔複製到webapps路徑，檔案名稱改為ROOT.war
-sudo cp /vagrant/build/libs/bbuddy-HEAD.war $CATALINA_HOME/webapps/ROOT.war
+sudo rm $CATALINA_HOME/webapps/ROOT -rf
+sudo cp build/libs/bbuddy-HEAD.war $CATALINA_HOME/webapps/ROOT.war
 sudo chown -R tomcat $CATALINA_HOME/webapps/ROOT.war
 
-sudo cp /vagrant/build/libs/bbuddy-HEAD.war $CATALINA_HOME/webapps/bbuddy.war
-sudo chown -R tomcat $CATALINA_HOME/webapps/bbuddy.war
-
 #啟動tomcat
-sudo -u tomcat bash $CATALINA_HOME/bin/startup.sh
+sudo -u tomcat $CATALINA_HOME/bin/startup.sh
