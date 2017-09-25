@@ -62,4 +62,4 @@ sudo cp /vagrant/build/libs/bbuddy-HEAD.war $CATALINA_HOME/webapps/bbuddy.war
 sudo chown -R tomcat $CATALINA_HOME/webapps/bbuddy.war
 
 #啟動tomcat
-sudo bash $CATALINA_HOME/bin/startup.sh
+sudo -u tomcat bash $CATALINA_HOME/bin/startup.sh
