@@ -2,10 +2,6 @@
   hosts: all
   become: Yes
   vars:
-    database:
-      user: nerd
-      pass: dbs3cr3t
-      name: bbuddydev
     java_version: 8u131
     gradle_version: 2.13
     tomcat_version: 8.5.14
@@ -16,8 +12,11 @@
     java_version_checksum:
       "8u131": "sha512:5f5428ad9a0bcd20533cafc7c28bd260064da2f00719c3b5dc4a970771ffae11b1b9a18bfef39476c448d63d3efb829641a6c22ffb8faa3bbb7b5b3670487d80"
   roles:
-    - mysql
-      mysql: "{{ database }}"
+    - role: mysql
+      mysql:
+        user: nerd
+        pass: dbs3cr3t
+        name: bbuddydev
   tasks:
 
     # - name: Ensure git, curl, unzip
