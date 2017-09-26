@@ -2,8 +2,6 @@
   hosts: all
   become: Yes
   vars:
-    java_version: 8u131
-    gradle_version: 2.13
     tomcat_version: 8.5.14
     install_dir: /opt
     cache_dir: /vagrant
@@ -17,57 +15,12 @@
         user: nerd
         pass: dbs3cr3t
         name: bbuddydev
+    - role: jdk
+      jdk_version: 8u131
+    - role: gradle
+      gradle_version: 2.13
+  
   tasks:
-
-    # - name: Ensure git, curl, unzip
-    #   apt: name=git,curl,unzip update_cache=yes cache_valid_time="{{ 3600 * 24 * 3 }}"
-
-    # - name: 获取 JDK8
-    #   get_url: >
-    #     url="https://d.chaifeng.com/mirror/jdk-{{ java_version }}-linux-i586.tar.gz"
-    #     dest="{{ cache_dir }}/jdk-{{ java_version }}-linux-i586.tar.gz"
-    #     checksum="{{ java_version_checksum[java_version] | default(omit) }}"
-
-    # - name: Set Java Home
-    #   set_fact:
-    #     java_home: "{{ install_dir }}/{{ java_version_map[java_version] }}"
-
-    # - name: 安装 JDK8
-    #   unarchive: >
-    #     remote_src=Yes
-    #     src="{{ cache_dir }}/jdk-{{ java_version }}-linux-i586.tar.gz"
-    #     dest="{{ java_home | dirname }}"
-    #     creates="{{ java_home }}/bin/java"
-
-    # - name: JDK8 Profile
-    #   copy:
-    #     content: |
-    #       export JAVA_HOME={{ java_home }}
-    #       export PATH="$JAVA_HOME/bin:$PATH"
-    #     dest: /etc/profile.d/java.sh
-
-    # - name: 获取 Gradle
-    #   get_url: >
-    #     url="https://d.chaifeng.com/mirror/gradle-{{ gradle_version }}-bin.zip"
-    #     dest="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
-
-    # - name: Set Gradle Home
-    #   set_fact:
-    #     gradle_home: "{{ install_dir }}/gradle-{{ gradle_version }}"
-
-    # - name: 安装 Gradle
-    #   unarchive: >-
-    #     remote_src=True
-    #     src="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
-    #     dest="{{ gradle_home | dirname }}"
-    #     creates="{{ gradle_home }}/bin/gradle"
-
-    # - name: Gradle Profile
-    #   copy:
-    #     content: |
-    #       export GRADLE_HOME={{ gradle_home }}
-    #       export PATH="$GRADLE_HOME/bin:$PATH"
-    #     dest: /etc/profile.d/gradle.sh
 
     # - name: 获取 Tomcat
     #   get_url: >

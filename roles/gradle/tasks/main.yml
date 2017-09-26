@@ -1,0 +1,22 @@
+- name: 获取 Gradle
+  get_url: >
+    url="https://d.chaifeng.com/mirror/gradle-{{ gradle_version }}-bin.zip"
+    dest="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
+
+- name: Set Gradle Home
+  set_fact:
+    gradle_home: "{{ install_dir }}/gradle-{{ gradle_version }}"
+
+- name: 安装 Gradle
+  unarchive: >-
+    remote_src=True
+    src="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
+    dest="{{ gradle_home | dirname }}"
+    creates="{{ gradle_home }}/bin/gradle"
+
+- name: Gradle Profile
+  copy:
+    content: |
+      export GRADLE_HOME={{ gradle_home }}
+      export PATH="$GRADLE_HOME/bin:$PATH"
+    dest: /etc/profile.d/gradle.sh

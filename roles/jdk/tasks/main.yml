@@ -1,0 +1,26 @@
+- name: Ensure git, curl, unzip
+  apt: name=git,curl,unzip update_cache=yes cache_valid_time="{{ 3600 * 24 * 3 }}"
+
+- name: 获取 JDK8
+  get_url: >
+    url="https://d.chaifeng.com/mirror/jdk-{{ jdk_version }}-linux-i586.tar.gz"
+    dest="{{ cache_dir }}/jdk-{{ jdk_version }}-linux-i586.tar.gz"
+    checksum="{{ jdk_version_checksum[jdk_version] | default(omit) }}"
+
+- name: Set Java Home
+  set_fact:
+    java_home: "{{ install_dir }}/{{ jdk_version_map[jdk_version] }}"
+
+- name: 安装 JDK8
+  unarchive: >
+    remote_src=Yes
+    src="{{ cache_dir }}/jdk-{{ jdk_version }}-linux-i586.tar.gz"
+    dest="{{ java_home | dirname }}"
+    creates="{{ java_home }}/bin/java"
+
+- name: JDK8 Profile
+  copy:
+    content: |
+      export JAVA_HOME={{ java_home }}
+      export PATH="$JAVA_HOME/bin:$PATH"
+    dest: /etc/profile.d/java.sh
