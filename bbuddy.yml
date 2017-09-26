@@ -1,0 +1,27 @@
+- name: deploy bboddy server
+  hosts: all
+  become: yes
+  tasks:
+    - name: update apt
+      apt:
+        update_cache: yes
+    - name: install mysql
+      apt:
+        name: mysql-server
+    - name: create bbuddy database
+      mysql_db:
+        name: bbuddydev
+        state: present
+    - name: create user nerd
+      mysql_user:
+        name: nerd
+        password: dbs3cr3t
+        priv: '*.*:ALL'
+    - name: install jdk
+      apt:
+        name: default-jdk
+    - name: download tomcat
+      get_url:
+        url: http://ftp.mirror.tw/pub/apache/tomcat/tomcat-8/v8.5.20/bin/apache-tomcat-8.5.20.tar.gz
+        dest: ~/
+      

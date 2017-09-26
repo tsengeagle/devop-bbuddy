@@ -31,20 +31,20 @@ fi
 #echo "建立使用者，賦予權限"
 #mysql -uroot -e "create user $dbuser@'localhost' identified by '$dbpass';"
 #mysql -uroot -e "grant all privileges on $dbname.* to $dbuser@'localhost';"
-#
-##安裝tomcat 8.5.x
-##先裝java8
-#sudo apt-get install default-jdk="$jdkversion" -y
-#echo "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-i386/jre" >> /etc/environment
-#source /etc/environment
-#
-#wget http://apache.stu.edu.tw/tomcat/tomcat-8/v"$tomcat_version"/bin/apache-tomcat-"$tomcat_version".tar.gz
-#sudo mkdir /var/lib/tomcat
-#sudo tar xvzf apache-tomcat-"$tomcat_version".tar.gz -C /var/lib/tomcat --strip-component=1
-#
-#echo "CATALINA_HOME=/var/lib/tomcat" >> /etc/environment
-#source /etc/environment
-#
+
+#安裝tomcat 8.5.x
+#先裝java8
+sudo apt-get install default-jdk="$jdkversion" -y
+echo "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-i386/jre" >> /etc/environment
+source /etc/environment
+
+wget http://apache.stu.edu.tw/tomcat/tomcat-8/v"$tomcat_version"/bin/apache-tomcat-"$tomcat_version".tar.gz
+sudo mkdir /var/lib/tomcat
+sudo tar xvzf apache-tomcat-"$tomcat_version".tar.gz -C /var/lib/tomcat --strip-component=1
+
+echo "CATALINA_HOME=/var/lib/tomcat" >> /etc/environment
+source /etc/environment
+
 ##安裝unzip及gradle
 #sudo apt-get install unzip -y
 #wget https://services.gradle.org/distributions/gradle-"$gradle_version"-bin.zip
@@ -67,7 +67,7 @@ fi
 
 #佈署
 #結束tomcat
-sudo "$CATALINA_HOME"/bin/shutdown.sh
+#sudo "$CATALINA_HOME"/bin/shutdown.sh
 
 #建完的war檔複製到webapps路徑，檔案名稱改為ROOT.war
 sudo rm "$CATALINA_HOME"/webapps/ROOT -rf

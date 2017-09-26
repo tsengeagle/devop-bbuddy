@@ -1,0 +1,5 @@
+- name: deploy bbuddy server
+  hosts: all
+  tasks:
+    - name: update apt
+    apt: 

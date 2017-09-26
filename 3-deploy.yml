@@ -1,0 +1,155 @@
+- name: BBuddy
+  hosts: all
+  become: Yes
+  vars:
+    database:
+      user: nerd
+      pass: dbs3cr3t
+      name: bbuddydev
+    java_version: 8u131
+    gradle_version: 2.13
+    tomcat_version: 8.5.14
+    install_dir: /opt
+    cache_dir: /vagrant
+    java_version_map:
+      "8u131": jdk1.8.0_131
+    java_version_checksum:
+      "8u131": "sha512:5f5428ad9a0bcd20533cafc7c28bd260064da2f00719c3b5dc4a970771ffae11b1b9a18bfef39476c448d63d3efb829641a6c22ffb8faa3bbb7b5b3670487d80"
+  tasks:
+    - name: 安装 mysql
+      apt: name=mysql-server,mysql-client update_cache=yes cache_valid_time="{{ 3600 * 24 * 3 }}"
+
+    - name: 给应用创建默认的用户名，以及默认的密码
+      mysql_user: name="{{ database.user }}" password="{{ database.pass }}" priv='*.*:ALL'
+
+    - name: 创建默认的数据库
+      mysql_db: name="{{ database.name }}"
+
+    - name: Ensure install & cache dir
+      file: path="{{ item }}" state=directory
+      with_items:
+        - "{{ install_dir }}"
+        - "{{ cache_dir }}"
+
+    - name: Ensure git, curl, unzip
+      apt: name=git,curl,unzip update_cache=yes cache_valid_time="{{ 3600 * 24 * 3 }}"
+
+    - name: 获取 JDK8
+      get_url: >
+        url="https://d.chaifeng.com/mirror/jdk-{{ java_version }}-linux-i586.tar.gz"
+        dest="{{ cache_dir }}/jdk-{{ java_version }}-linux-i586.tar.gz"
+        checksum="{{ java_version_checksum[java_version] | default(omit) }}"
+
+    - name: Set Java Home
+      set_fact:
+        java_home: "{{ install_dir }}/{{ java_version_map[java_version] }}"
+
+    - name: 安装 JDK8
+      unarchive: >
+        remote_src=Yes
+        src="{{ cache_dir }}/jdk-{{ java_version }}-linux-i586.tar.gz"
+        dest="{{ java_home | dirname }}"
+        creates="{{ java_home }}/bin/java"
+
+    - name: JDK8 Profile
+      copy:
+        content: |
+          export JAVA_HOME={{ java_home }}
+          export PATH="$JAVA_HOME/bin:$PATH"
+        dest: /etc/profile.d/java.sh
+
+    - name: 获取 Gradle
+      get_url: >
+        url="https://d.chaifeng.com/mirror/gradle-{{ gradle_version }}-bin.zip"
+        dest="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
+
+    - name: Set Gradle Home
+      set_fact:
+        gradle_home: "{{ install_dir }}/gradle-{{ gradle_version }}"
+
+    - name: 安装 Gradle
+      unarchive: >-
+        remote_src=True
+        src="{{ cache_dir }}/gradle-{{ gradle_version }}-bin.zip"
+        dest="{{ gradle_home | dirname }}"
+        creates="{{ gradle_home }}/bin/gradle"
+
+    - name: Gradle Profile
+      copy:
+        content: |
+          export GRADLE_HOME={{ gradle_home }}
+          export PATH="$GRADLE_HOME/bin:$PATH"
+        dest: /etc/profile.d/gradle.sh
+
+    - name: 获取 Tomcat
+      get_url: >
+        url="https://d.chaifeng.com/mirror/apache-tomcat-{{ tomcat_version }}.tar.gz"
+        dest="{{ cache_dir }}/apache-tomcat-{{ tomcat_version }}.tar.gz"
+
+    - name: Catalina Home
+      set_fact:
+        catalina_home: "{{ install_dir }}/apache-tomcat-{{ tomcat_version }}"
+
+    - name: 安装 Tomcat
+      unarchive: >
+        remote_src=True
+        src="{{ cache_dir }}/apache-tomcat-{{ tomcat_version }}.tar.gz"
+        dest="{{ catalina_home | dirname }}"
+        creates="{{ catalina_home }}/bin/startup.sh"
+
+    - name: 为 BBuddy 生成临时目录
+      tempfile: state=directory
+      register: bbuddy_dir
+
+    - name: 获取 BBuddy 代码
+      git: >
+        repo="https://github.com/nerds-odd-e/bbuddy.git"
+        dest="{{ bbuddy_dir.path }}"
+        clone=yes
+
+    - name: 构建 BBuddy
+      shell: |
+        source /etc/profile
+        cd {{ bbuddy_dir.path }}
+        gradle war
+      args:
+        executable: /bin/bash
+
+    - name: 关闭 Tomcat
+      shell: |
+        source /etc/profile
+        export CATALINA_HOME="{{ catalina_home }}"
+
+        if pgrep -lf "/bin/java .+${CATALINA_HOME}"; then
+            "$CATALINA_HOME/bin/shutdown.sh"
+        fi
+
+        SHUTDOWN_TIMEOUT=30
+        while pgrep -lf "/bin/java .+${CATALINA_HOME}" && [[ "$SHUTDOWN_TIMEOUT" -gt 0 ]]; do
+            sleep 1
+            : $(( SHUTDOWN_TIMEOUT-- ))
+        done
+        if [[ "$SHUTDOWN_TIMEOUT" -le 0 ]]; then
+            pgrep -f "/bin/java .+${CATALINA_HOME}" | xargs kill -9
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: 删除 Tomcat 自带的根应用
+      file: path="{{ item }}" state=absent
+      with_items:
+        - "{{ catalina_home }}/webapps/ROOT.war"
+        - "{{ catalina_home }}/webapps/ROOT"
+
+    - name: 部署 BBuddy
+      copy: remote_src=Yes src="{{ bbuddy_dir.path }}/build/libs/bbuddy-HEAD.war" dest="{{ catalina_home }}/webapps/ROOT.war"
+
+    - name: 启动 Tomcat
+      shell: |
+        source /etc/profile
+        export CATALINA_HOME="{{ catalina_home }}"
+
+        nohup "${CATALINA_HOME}/bin/startup.sh"
+        sleep 25
+      args:
+        executable: /bin/bash
