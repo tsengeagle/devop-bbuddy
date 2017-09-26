@@ -20,7 +20,7 @@
     - role: gradle
       gradle_version: 2.13
   
-  tasks:
+  #tasks:
 
     # - name: 获取 Tomcat
     #   get_url: >
