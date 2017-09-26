@@ -1,0 +1,14 @@
+  - name: 安装 mysql
+    apt: name=mysql-server,mysql-client update_cache=yes cache_valid_time="{{ 3600 * 24 * 3 }}"
+
+  - name: 给应用创建默认的用户名，以及默认的密码
+    mysql_user: name="{{ mysql.user }}" password="{{ mysql.pass }}" priv='*.*:ALL'
+
+  - name: 创建默认的数据库
+    mysql_db: name="{{ mysql.name }}"
+
+  - name: Ensure install & cache dir
+    file: path="{{ item }}" state=directory
+    with_items:
+      - "{{ install_dir }}"
+      - "{{ cache_dir }}"

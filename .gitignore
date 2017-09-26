@@ -85,3 +85,6 @@ gradle-app.setting
 
 # Sonar
 .sonar
+apache-tomcat-8.5.14.tar.gz
+gradle-2.13-bin.zip
+jdk-8u131-linux-i586.tar.gz

@@ -22,6 +22,6 @@ Vagrant.configure("2") do |config|
                    python-dev libffi-dev
                    
     cd /vagrant
-    ansible-playbook --inventory hosts.txt bbuddy.yml
+    ansible-playbook --inventory hosts.txt 3-deploy.yml
   SHELL
 end
